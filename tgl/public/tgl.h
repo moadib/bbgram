@@ -372,6 +372,9 @@ void tgl_do_get_history_maxid (struct tgl_state *TLS, tgl_peer_id_t id, int offs
 void tgl_do_msg_search_media (struct tgl_state *TLS, tgl_peer_id_t id, int from, int to, int limit, int offset, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success, int size, struct tgl_message *list[]), void *callback_extra);
 void tgl_do_msg_search_files (struct tgl_state *TLS, tgl_peer_id_t id, int from, int to, int limit, int offset, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success, int size, struct tgl_message *list[]), void *callback_extra);
 
+void tgl_do_register_device (struct tgl_state *TLS, int token_type, const char* token, const char* device_model, const char* system_version, const char* app_version, int app_sandbox, const char* lang_code, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success), void *callback_extra);
+void tgl_do_unregister_device (struct tgl_state *TLS, int token_type, const char* token, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success), void *callback_extra);
+
 void tgl_do_forward_messages (struct tgl_state *TLS, tgl_peer_id_t id, int size, int identifiers[], void (*callback)(struct tgl_state *TLS, void *callback_extra, int success, int num, struct tgl_message *ML[]), void *callback_extra);
 void tgl_do_get_wallpapers (struct tgl_state *TLS, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success, int num, struct tgl_wallpaper wallpapers[]), void *callback_extra);
 

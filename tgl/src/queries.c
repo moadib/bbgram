@@ -4947,6 +4947,43 @@ void tgl_do_msg_search_files (struct tgl_state *TLS, tgl_peer_id_t id, int from,
     _tgl_do_msg_search(TLS, id, CODE_input_messages_filter_document, from, to, limit, offset, 0, s, 0, 0, 0, callback, callback_extra);
 }
 
+static int register_device_on_answer (struct tgl_state *TLS, struct query *q) {
+  fetch_bool ();
+  if (q->callback) {
+    ((void (*)(struct tgl_state *TLS, void *, int))(q->callback))(TLS, q->callback_extra, 1);
+  }
+  return 0;
+}
+
+static struct query_methods register_device_methods  = {
+  .on_answer = register_device_on_answer,
+  .on_error = q_void_on_error,
+  .type = TYPE_TO_PARAM(bool)
+};
+
+void tgl_do_register_device (struct tgl_state *TLS, int token_type, const char* token, const char* device_model, const char* system_version, const char* app_version, int app_sandbox, const char* lang_code, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success), void *callback_extra)
+{
+    clear_packet ();
+    out_int (CODE_account_register_device);
+    out_int (token_type);
+    out_string (token);
+    out_string (device_model);
+    out_string (system_version);
+    out_string (app_version);
+    out_int (token_type ? CODE_bool_true : CODE_bool_false);
+    out_string (lang_code);
+    tglq_send_query(TLS, TLS->DC_working, packet_ptr - packet_buffer, packet_buffer, &register_device_methods, 0, callback, callback_extra);
+}
+
+void tgl_do_unregister_device (struct tgl_state *TLS, int token_type, const char* token, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success), void *callback_extra)
+{
+    clear_packet ();
+    out_int (CODE_account_unregister_device);
+    out_int (token_type);
+    out_string (token);
+    tglq_send_query(TLS, TLS->DC_working, packet_ptr - packet_buffer, packet_buffer, &register_device_methods, 0, callback, callback_extra);
+}
+
 static int fwd_msgs_on_answer (struct tgl_state *TLS, struct query *q) {
   assert (fetch_int () == (int)CODE_messages_stated_messages);
   assert (fetch_int () == CODE_vector);
