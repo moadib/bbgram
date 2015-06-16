@@ -4560,3 +4560,31 @@ void tgl_do_get_authorizations (struct tgl_state *TLS, void (*callback)(struct t
     out_int (CODE_account_get_authorizations);
     tglq_send_query(TLS, TLS->DC_working, packet_ptr - packet_buffer, packet_buffer, &get_authorizations_methods, 0, callback, callback_extra);
 }
+
+static int reset_authorization_on_answer (struct tgl_state *TLS, struct query *q, void *D) {
+    if (q->callback) {
+        ((void (*)(struct tgl_state *, void *, int))(q->callback)) (TLS, q->callback_extra, 1);
+    }
+    return 0;
+}
+
+static struct query_methods reset_authorizations_methods = {
+  .on_answer = reset_authorization_on_answer,
+  .on_error = q_void_on_error,
+  .type = TYPE_TO_PARAM(bool)
+};
+
+void tgl_do_reset_authorizations (struct tgl_state *TLS, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success), void *callback_extra)
+{
+    clear_packet ();
+    out_int (CODE_auth_reset_authorizations);
+    tglq_send_query(TLS, TLS->DC_working, packet_ptr - packet_buffer, packet_buffer, &reset_authorizations_methods, 0, callback, callback_extra);
+}
+
+void tgl_do_reset_authorization (struct tgl_state *TLS, long long hash, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success), void *callback_extra)
+{
+    clear_packet ();
+    out_int (CODE_account_reset_authorization);
+    out_long (hash);
+    tglq_send_query(TLS, TLS->DC_working, packet_ptr - packet_buffer, packet_buffer, &reset_authorizations_methods, 0, callback, callback_extra);
+}
