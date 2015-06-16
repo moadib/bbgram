@@ -26,6 +26,7 @@ using namespace bb::system;
 #include "model/Media.h"
 #include "model/Wallpaper.h"
 
+#include "utils/DateTimeFormatter.h"
 #include "utils/VirtualKeyboardService.h"
 
 ApplicationUI::ApplicationUI(bb::cascades::Application* app) :
@@ -46,6 +47,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application* app) :
     qmlRegisterType<Wallpaper>("bbgram.types.lib", 0, 1, "Wallpaper");
     qmlRegisterType<QTimer>("bbgram.types.lib", 0, 1, "QTimer");
 
+    qmlRegisterType<DateTimeFormatter>("bbgram.types.lib", 0, 1, "DateTimeFormatter");
     qmlRegisterType<VirtualKeyboardService>("bbgram.bps.lib", 0, 1, "VirtualKeyboardService");
 
     m_telegraph = new Telegraph();
