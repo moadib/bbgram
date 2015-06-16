@@ -4517,3 +4517,46 @@ void tgl_do_set_account_ttl (struct tgl_state *TLS, int days, void (*callback)(s
     out_int (days);
     tglq_send_query(TLS, TLS->DC_working, packet_ptr - packet_buffer, packet_buffer, &set_account_ttl_methods, 0, callback, callback_extra);
 }
+
+static int get_authorizations_on_answer (struct tgl_state *TLS, struct query *q, void *DS) {
+    struct tl_ds_account_authorizations *DS_AA = DS;
+
+    int i, l;
+    int n = *DS_AA->authorizations->cnt;
+    struct tgl_authorization *authorizations = talloc0 (sizeof (struct tgl_authorization) * n);
+    for (i = 0; i < n; i++) {
+        struct tgl_authorization* A = authorizations + i;
+        struct tl_ds_authorization* DS_A = DS_AA->authorizations->data[i];
+        A->hash = *DS_A->hash;
+        A->flags = *DS_A->flags;
+        A->device_model = DS_A->device_model->data;
+        A->platform = DS_A->platform->data;
+        A->system_version = DS_A->system_version->data;
+        A->api_id = *DS_A->api_id;
+        A->app_name = DS_A->app_name->data;
+        A->app_version = DS_A->app_version->data;
+        A->date_created = *DS_A->date_created;
+        A->date_active = *DS_A->date_active;
+        A->ip = DS_A->ip->data;
+        A->country = DS_A->country->data;
+        A->region = DS_A->region->data;
+    }
+    if (q->callback) {
+        ((void (*)(struct tgl_state *, void *, int, int, struct tgl_authorization[]))(q->callback)) (TLS, q->callback_extra, 1, n, authorizations);
+    }
+    tfree (authorizations, n * sizeof (struct tgl_authorization));
+    return 0;
+}
+
+static struct query_methods get_authorizations_methods = {
+  .on_answer = get_authorizations_on_answer,
+  .on_error = q_list_on_error,
+  .type = TYPE_TO_PARAM(account_authorizations)
+};
+
+void tgl_do_get_authorizations (struct tgl_state *TLS, void (*callback)(struct tgl_state *TLS, void *callback_extra, int success, int num, struct tgl_authorization authorizations[]), void *callback_extra)
+{
+    clear_packet ();
+    out_int (CODE_account_get_authorizations);
+    tglq_send_query(TLS, TLS->DC_working, packet_ptr - packet_buffer, packet_buffer, &get_authorizations_methods, 0, callback, callback_extra);
+}

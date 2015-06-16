@@ -530,6 +530,22 @@ struct tgl_wallpaper {
     };
 };
 
+struct tgl_authorization {
+    long long hash;
+    int flags;
+    char* device_model;
+    char* platform;
+    char* system_version;
+    int api_id;
+    char* app_name;
+    char* app_version;
+    int date_created;
+    int date_active;
+    char* ip;
+    char* country;
+    char* region;
+};
+
 
 #pragma pack(pop)
 #endif
