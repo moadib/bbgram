@@ -252,8 +252,8 @@ NavigationPane {
                 source: "settings/ChatBackground.qml"             
             },
             ComponentDefinition {
-            id: editContactSheetDef
-            source: "contacts/EditContact.qml"
+                id: editContactSheetDef
+                source: "contacts/EditContact.qml"
             }
         ]
     }

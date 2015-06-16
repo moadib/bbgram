@@ -56,6 +56,8 @@ public:
 
     Q_INVOKABLE void startRecord();
     Q_INVOKABLE QString stopRecord();
+
+    Q_INVOKABLE bb::cascades::DataModel* getAuthorizations() const;
     
     int accountTTL() const;
     void setAccountTTL(int days);
@@ -102,4 +104,5 @@ protected:
     static void _sendAudioCallback(struct tgl_state *TLS, void *callback_extra, int success, struct tgl_message *M);
     static void _getAccountTTLCallback(struct tgl_state *TLS, void *callback_extra, int success, int days);
     static void _setAccountTTLCallback(struct tgl_state *TLS, void *callback_extra, int success);
+    static void _getAuthorizationsCallback(struct tgl_state *TLS, void *callback_extra, int success, int num, struct tgl_authorization authorizations[]);
 };

@@ -24,8 +24,12 @@ Page {
                 text: "Security"
             }
             SettingsRow {
-                text: "Terminate all other sessions"
-                arrowVisible: false
+                text: "Active Sessions"
+                onClicked: {
+                    var navigationPane = Application.scene.activeTab.content 
+                    var page = activeSessionsDef.createObject()
+                    navigationPane.push(page);
+                }
             }
             
             SettingsHeader {
@@ -86,4 +90,11 @@ Page {
             }
         }
     }
+    
+    attachedObjects: [
+        ComponentDefinition {                      
+            id: activeSessionsDef                       
+            source: "ActiveSessions.qml"             
+        }
+    ]
 }

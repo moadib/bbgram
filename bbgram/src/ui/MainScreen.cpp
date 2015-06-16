@@ -281,6 +281,39 @@ void MainScreen::_setAccountTTLCallback(struct tgl_state *TLS, void *callback_ex
     delete extra;
 }
 
+void MainScreen::_getAuthorizationsCallback(struct tgl_state *TLS, void *callback_extra, int success, int num, struct tgl_authorization authorizations[])
+{
+    if (!success)
+        return;
+    bb::cascades::ArrayDataModel* model = (bb::cascades::ArrayDataModel*)callback_extra;
+    for (int i = 0; i < num; i++)
+    {
+        QVariantMap authorization;
+        authorization.insert("hash", QVariant::fromValue(authorizations[i].hash));
+        authorization.insert("flags", authorizations[i].flags);
+        authorization.insert("device_model", QString::fromUtf8(authorizations[i].device_model));
+        authorization.insert("platform", QString::fromUtf8(authorizations[i].platform));
+        authorization.insert("system_version", QString::fromUtf8(authorizations[i].system_version));
+        authorization.insert("api_id", authorizations[i].api_id);
+        authorization.insert("app_name", QString::fromUtf8(authorizations[i].app_name));
+        authorization.insert("app_version", QString::fromUtf8(authorizations[i].app_version));
+        authorization.insert("date_created", authorizations[i].date_created);
+        authorization.insert("date_active", authorizations[i].date_active);
+        authorization.insert("ip", QString::fromUtf8(authorizations[i].ip));
+        authorization.insert("country", QString::fromUtf8(authorizations[i].country));
+        authorization.insert("region", QString::fromUtf8(authorizations[i].region));
+        model->insert(model->size(), authorization);
+    }
+}
+
+bb::cascades::DataModel* MainScreen::getAuthorizations() const
+{
+    bb::cascades::ArrayDataModel* model = new bb::cascades::ArrayDataModel();
+    tgl_do_get_authorizations(gTLS, MainScreen::_getAuthorizationsCallback, model);
+    return model;
+}
+
+
 void MainScreen::copyMessagesToClipboard(const QVariantList& messages)
 {
     QList<Message*> list;
