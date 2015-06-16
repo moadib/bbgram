@@ -32,8 +32,11 @@ Page {
             dataModel: _owner.authorizations
             
             onTriggered: {
-                resetAuthorizationDialog.data = listView.dataModel.data(indexPath);
-                resetAuthorizationDialog.show()
+                var data = listView.dataModel.data(indexPath);
+                if (data.is_current != 1) {
+                    resetAuthorizationDialog.data = data
+                    resetAuthorizationDialog.show();
+                }
             }
             attachedObjects: [
                 SystemDialog {

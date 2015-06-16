@@ -303,7 +303,7 @@ void MainScreen::_getAuthorizationsCallback(struct tgl_state *TLS, void *callbac
         authorization.insert("ip", QString::fromUtf8(authorizations[i].ip));
         authorization.insert("country", QString::fromUtf8(authorizations[i].country));
         authorization.insert("region", QString::fromUtf8(authorizations[i].region));
-        authorization.insert("is_current", i == 0 ? 1 : 0);
+        authorization.insert("is_current", i == 0 ? 1 : 0); // should be set if flags & 1?
         model->insert(authorization);
     }
     model->setSortingKeys(QStringList() << "is_current" << "date_active");
