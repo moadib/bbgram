@@ -20,6 +20,7 @@ class MainScreen : public Screen<bb::cascades::TabbedPane>
 
     Q_PROPERTY(QString wallpaper READ wallpaper WRITE setWallpaper NOTIFY wallpaperChanged)
     Q_PROPERTY(int accountTTL READ accountTTL WRITE setAccountTTL NOTIFY accountTTLChanged)
+    Q_PROPERTY(bb::cascades::DataModel* authorizations READ authorizations NOTIFY authorizationsChanged)
 public:
     MainScreen(ApplicationUI* app);
     ~MainScreen();
@@ -57,7 +58,9 @@ public:
     Q_INVOKABLE void startRecord();
     Q_INVOKABLE QString stopRecord();
 
-    Q_INVOKABLE bb::cascades::DataModel* getAuthorizations() const;
+    Q_INVOKABLE bb::cascades::DataModel* authorizations() const;
+    Q_INVOKABLE void resetAuthorizations();
+    Q_INVOKABLE void resetAuthorization(long long hash);
     
     int accountTTL() const;
     void setAccountTTL(int days);
@@ -71,6 +74,7 @@ signals:
     void groupCreated(GroupChat* groupChat);
     void wallpaperChanged();
     void accountTTLChanged();
+    void authorizationsChanged();
 protected slots:
     void onAppFullScreen();
     void onAppThumbnail();
@@ -105,4 +109,5 @@ protected:
     static void _getAccountTTLCallback(struct tgl_state *TLS, void *callback_extra, int success, int days);
     static void _setAccountTTLCallback(struct tgl_state *TLS, void *callback_extra, int success);
     static void _getAuthorizationsCallback(struct tgl_state *TLS, void *callback_extra, int success, int num, struct tgl_authorization authorizations[]);
+    static void _resetAuthorizationCallback(struct tgl_state *TLS, void *callback_extra, int success);
 };

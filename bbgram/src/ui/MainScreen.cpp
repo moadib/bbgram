@@ -6,6 +6,7 @@
 
 #include <bb/ApplicationInfo>
 #include <bb/cascades/Application>
+#include <bb/cascades/GroupDataModel>
 #include <bb/system/Clipboard>
 #include <bb/system/InvokeManager>
 #include <bb/system/InvokeRequest>
@@ -285,7 +286,7 @@ void MainScreen::_getAuthorizationsCallback(struct tgl_state *TLS, void *callbac
 {
     if (!success)
         return;
-    bb::cascades::ArrayDataModel* model = (bb::cascades::ArrayDataModel*)callback_extra;
+    bb::cascades::GroupDataModel* model = (bb::cascades::GroupDataModel*)callback_extra;
     for (int i = 0; i < num; i++)
     {
         QVariantMap authorization;
@@ -297,20 +298,41 @@ void MainScreen::_getAuthorizationsCallback(struct tgl_state *TLS, void *callbac
         authorization.insert("api_id", authorizations[i].api_id);
         authorization.insert("app_name", QString::fromUtf8(authorizations[i].app_name));
         authorization.insert("app_version", QString::fromUtf8(authorizations[i].app_version));
-        authorization.insert("date_created", authorizations[i].date_created);
-        authorization.insert("date_active", authorizations[i].date_active);
+        authorization.insert("date_created", QDateTime::fromTime_t(authorizations[i].date_created));
+        authorization.insert("date_active", QDateTime::fromTime_t(authorizations[i].date_active));
         authorization.insert("ip", QString::fromUtf8(authorizations[i].ip));
         authorization.insert("country", QString::fromUtf8(authorizations[i].country));
         authorization.insert("region", QString::fromUtf8(authorizations[i].region));
-        model->insert(model->size(), authorization);
+        authorization.insert("is_current", i == 0 ? 1 : 0);
+        model->insert(authorization);
     }
+    model->setSortingKeys(QStringList() << "is_current" << "date_active");
+    model->setSortedAscending(false);
+    model->setGrouping(ItemGrouping::ByFullValue);
 }
 
-bb::cascades::DataModel* MainScreen::getAuthorizations() const
+bb::cascades::DataModel* MainScreen::authorizations() const
 {
-    bb::cascades::ArrayDataModel* model = new bb::cascades::ArrayDataModel();
+    bb::cascades::GroupDataModel * model = new bb::cascades::GroupDataModel();
     tgl_do_get_authorizations(gTLS, MainScreen::_getAuthorizationsCallback, model);
     return model;
+}
+
+void MainScreen::_resetAuthorizationCallback(struct tgl_state *TLS, void *callback_extra, int success)
+{
+    MainScreen* s = (MainScreen*)callback_extra;
+    if (success == 1)
+        emit s->authorizationsChanged();
+}
+
+void MainScreen::resetAuthorizations()
+{
+    tgl_do_reset_authorizations(gTLS, MainScreen::_resetAuthorizationCallback, this);
+}
+
+void MainScreen::resetAuthorization(long long hash)
+{
+    tgl_do_reset_authorization(gTLS, hash, MainScreen::_resetAuthorizationCallback, this);
 }
 
 
